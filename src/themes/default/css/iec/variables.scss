@@ -1,0 +1,12 @@
+@import '../variables/colors';
+
+$color-primary: map-get(map-get($colors-theme, primary), default);
+$color-secondary: map-get(map-get($colors-theme, primary), default);
+$color-accent: map-get(map-get($colors-theme, primary), default);
+
+$shadow-default: 0px 0px 30px 0px rgba(0,0,0,0.6);
+$shadow-light: 0px 0px 30px 0px rgba(0,0,0,0.3);
+
+$font-size-sm: 14px;
+$font-size-md: 18px;
+$font-size-lg: 24px;
