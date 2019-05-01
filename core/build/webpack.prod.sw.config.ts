@@ -64,7 +64,7 @@ module.exports = merge(base, {
         urlPattern: "/api/*",
         handler: "networkFirst"
       },{
-        urlPattern: "/assets/logo.svg",
+        urlPattern: "/assets/logo.png",
         handler: "networkFirst"
       },{
         urlPattern: "/index.html",

@@ -3,7 +3,7 @@
     <img
       :width="width"
       :height="height"
-      src="/assets/logo.svg"
+      src="/assets/logo.png"
       alt="Vuestore logo"
     >
   </router-link>

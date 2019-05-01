@@ -19,7 +19,8 @@ $colors: (
   buccaneer: #755,
   forest-green: #308c14,
   puerto-rico: #4dba87,
-  mine-shaft: #333
+  mine-shaft: #333,
+  iec-green: #75cbbc
 );
 
 // Theme generic colors
@@ -27,8 +28,8 @@ $colors: (
 // Value: color value or map with default, hover, focus color values
 $colors-theme: (
   primary: (
-    default: map-get($colors, matterhorn),
-    hover: map-get($colors, matterhorn)
+    default: map-get($colors, iec-green),
+    hover: map-get($colors, iec-green)
   ),
   secondary: (
     default: map-get($colors, gray),
