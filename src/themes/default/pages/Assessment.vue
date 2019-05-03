@@ -5,13 +5,24 @@
         {{ question.text }}
         <div v-if="question.type === 'input'" type="text" name="" value="">
           <input v-model="response[index].answer" type="text" name="" value="">
+
         </div>
         <div v-else-if="question.type === 'choose'" class="" :key="text" v-for="text in question.options">
-          <button :class="{ selected : response[index] && response[index].answer === text}" @click="response[index].answer = text; question.selected = text;"> {{ text }}</button>
+          <button :class="{ selected : response[index] && response[index].answer === text}" @click="response[index].answer = text"> {{ text }}</button>
         </div>
         <div v-else-if="question.type === 'checkbox'" class="" :key="text" v-for="text in question.options">
           <input type="checkbox" @change="vmodelChecked($event, index)" :name="text" :value="text"><span> {{ text }}</span>
         </div>
+
+        <div v-if="response[index] && response[index].answer && question.subQuestions" :key="subQuestion.id" v-for="(subQuestion, subIndex) in question.subQuestions">
+          <div class="form-question" v-if="response[index].answer === subQuestion.parentOption">
+            {{ subQuestion.text }}
+            <div v-if="subQuestion.type === 'choose'" class="" :key="subText" v-for="subText in subQuestion.options">
+              <button :class="{ selected : response[index].subQuestions[subIndex].answer && response[index].subQuestions[subIndex].answer === subText }" @click="response[index].subQuestions[subIndex].answer = subText"> {{ subText }}</button>
+            </div>
+          </div>
+        </div>
+
       </div>
       <div class="form-question form-submit">
         <button @click="submit()" type="button" name="button">SUBMIT</button>
@@ -31,7 +42,7 @@ export default {
       }
     },
     submit: function () {
-      console.log(this.response)
+      console.log('SEND TO API: ', this.response)
     }
   },
   components: {
@@ -66,7 +77,18 @@ export default {
             'Normal: Between 90/60 - 140/90',
             'Low: Below 90/60',
             'High - Above 140/90'
-          ]
+          ],
+          subQuestions: [{
+            parentId: 2,
+            parentOption: 'High - Above 140/90',
+            id: 9,
+            text: 'Is your blood pressure currently being controlled with medication?',
+            type: 'choose',
+            options: [
+              'Yes',
+              'No'
+            ]
+          }]
         },
         {
           id: 4,
@@ -74,7 +96,6 @@ export default {
           type: 'input'
         },
         {
-
           id: 5,
           text: 'Tick the appropriate boxes to show whether you have, or have ever been diagnosed with, any of the following.',
           type: 'checkbox',
@@ -82,30 +103,8 @@ export default {
             'Diabetes',
             'High blood pressure',
             'Thyroid problem',
-            'Stroke',
-            'Angina',
-            'Heart attack or other cardiovascular problems',
-            'Liver disease',
-            'Kidney disease',
-            'Blood clotting problems',
-            'Stomach or intestinal ulcer',
-            'Dementia',
-            'Mental illness',
-            'Depression',
-            'Injury of the brain',
-            'Alcohol or drug problem',
-            'Hereditary degenrative retinal disorder',
-            'Anterior ischaemic optic neuropathy',
-            'An abnormal heartbeat',
-            'An abnormal penis',
-            'Sickle cell disease, myeloma or leukaemia',
-            'None of the above'
+            'Stroke'
           ]
-        },
-        {
-          id: 6,
-          text: 'Are you allergic to any foods or drugs?',
-          type: 'input'
         }
       ],
       response: [],
@@ -114,9 +113,20 @@ export default {
   },
   beforeMount: function () {
     this.payload.forEach((question, index) => {
-      this.response.push({
+      this.response.push(Object.assign({
         answer: question.type === 'checkbox' ? [] : ''
-      })
+      }, question))
+      if (question.subQuestions) {
+        this.response[index].subQuestions = []
+        question.subQuestions.forEach((subQuestion, subIndex) => {
+          this.response[index].subQuestions.push(
+            Object.assign({
+              answer: subQuestion.type === 'checkbox' ? [] : ''
+            }, subQuestion)
+          )
+          console.log(this.response[index].subQuestions)
+        })
+      }
     })
   }
 }
