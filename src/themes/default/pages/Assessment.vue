@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="">
+  <div class="container">
     <AssessmentForm/>
   </div>
 </template>
@@ -13,5 +13,12 @@ export default {
 }
 </script>
 
-<style lang="css" scoped>
+<style lang="scss" scoped>
+@import 'theme/css/main.scss';
+.container{
+  padding:30px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
 </style>

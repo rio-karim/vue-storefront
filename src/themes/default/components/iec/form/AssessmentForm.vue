@@ -1,8 +1,6 @@
 <template>
-  <div class="tree">
-    <ul class="tree-list">
-      <assessment-node v-for="node in payload" :key="node.id" :node="node"/>
-    </ul>
+  <div class="form">
+    <assessment-node v-for="node in payload" :key="node.id" :node="node"/>
   </div>
 </template>
 
@@ -78,5 +76,5 @@ export default {
 }
 </script>
 
-<style>
+<style lang='scss'>
 </style>
