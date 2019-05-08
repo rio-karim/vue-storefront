@@ -70,8 +70,32 @@ export default {
             'Stroke'
           ]
         }
-      ]
+      ],
+      response: []
     }
+  },
+  methods: {
+    extendDeep: function (arr, data) {
+      let jsonFind = JSON.stringify(this.findDeep(arr, data.id))
+      let jsonReplace = JSON.stringify(this.$_.extend(this.findDeep(arr, data.id), data))
+      return JSON.parse(JSON.stringify(arr).replace(jsonFind, jsonReplace))
+    },
+    findDeep: function (arr, id) {
+      for (const obj of arr) {
+        if (obj.id === id) { return obj }
+        if (obj.subQuestions) {
+          let result = this.findDeep(obj.subQuestions, id)
+          if (result) { return result }
+        }
+      }
+    }
+  },
+  beforeMount: function () {
+    this.$root.$on('updateAssessment', data => {
+      console.log('Node recieved: ', data)
+      this.response = this.extendDeep(this.payload, { id: data.id, answer: data.answer })
+      console.log('Response ready: ', this.response)
+    })
   }
 }
 </script>
