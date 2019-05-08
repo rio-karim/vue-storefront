@@ -1,6 +1,8 @@
 <template>
   <div class="form">
+    <button @click="cycleQuestion('down')" class="cycle-question cycle-question--left" type="button" name="button">LEFT CYCLE</button>
     <assessment-node v-for="node in payload" :key="node.id" :node="node"/>
+    <button @click="cycleQuestion('up')" class="cycle-question cycle-question--right" type="button" name="button">RIGHT CYCLE</button>
   </div>
 </template>
 
@@ -17,7 +19,8 @@ export default {
         {
           id: 0,
           text: 'Height (in centimetres):',
-          type: 'input'
+          type: 'input',
+          active: true
         },
         {
           id: 1,
@@ -75,6 +78,19 @@ export default {
     }
   },
   methods: {
+    cycleQuestion: function (traverse) {
+      // Extend to render new active payloads
+      let self = this
+      let currentIndex = self.$_.findIndex(this.payload, (checkIndex) => checkIndex.active)
+      if (traverse === 'up' && currentIndex < (this.payload.length - 1)) {
+        delete this.payload[currentIndex].active
+        this.payload[currentIndex + 1].active = true
+      } else if (traverse === 'down' && currentIndex > 0) {
+        delete this.payload[currentIndex].active
+        this.payload[currentIndex - 1].active = true
+      }
+      console.log(this.payload)
+    },
     extendDeep: function (arr, data) {
       let jsonFind = JSON.stringify(this.findDeep(arr, data.id))
       let jsonReplace = JSON.stringify(this.$_.extend(this.findDeep(arr, data.id), data))
@@ -88,17 +104,44 @@ export default {
           if (result) { return result }
         }
       }
+    },
+    submitOrder: function () {
+      console.log('%c Sending Response: ', 'color: #75cbbc;', this.response)
     }
   },
   beforeMount: function () {
     this.$root.$on('updateAssessment', data => {
-      console.log('Node recieved: ', data)
+      console.log('%c Node Recieved: ', 'color: #75cbbc;', data)
       this.response = this.extendDeep(this.payload, { id: data.id, answer: data.answer })
-      console.log('Response ready: ', this.response)
     })
   }
 }
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
+.form{
+  align-items: center;
+  justify-content:center;
+  position:absolute;
+  right:0;
+  left:-100%;
+  bottom:0;
+  top:0;
+
+  button.cycle-question{
+    position:fixed;
+    top:50%;
+    bottom:50%;
+    height:40px;
+    width:40px;
+    display:block;
+    z-index:3000;
+    &--left{
+      left:40px;
+    }
+    &--right{
+      right:40px;
+    }
+  }
+}
 </style>

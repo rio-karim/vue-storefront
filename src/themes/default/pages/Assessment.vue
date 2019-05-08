@@ -16,9 +16,19 @@ export default {
 <style lang="scss" scoped>
 @import 'theme/css/main.scss';
 .container{
-  padding:30px;
+  position:fixed;
+  top:54px;
+  bottom:0;
+  left:0;
+  right:0;
   display:flex;
-  align-items:center;
-  justify-content:center;
+  z-index:2000;
+  width:unset;
+  max-width:unset;
+}
+</style>
+<style lang="scss">
+footer{
+  display:none;
 }
 </style>
