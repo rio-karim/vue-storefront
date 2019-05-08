@@ -5,9 +5,10 @@ import Vue from 'vue'
 import VueProgressBar from 'vue-progressbar'
 import '@vue-storefront/core/lib/passive-listeners'
 import { once } from '@vue-storefront/core/helpers'
-
+import underscore from 'vue-underscore'
 once('__VUE_EXTEND_DROPPOINT_VPB__', () => {
   Vue.use(VueProgressBar)
+  Vue.use(underscore)
 })
 
 const themeEntry = App
