@@ -1,5 +1,5 @@
 <template>
-  <div class="form-question" :class="{ active: node.active }">
+  <div class="form-question" :class="{ active: isActive }">
     <div class="form-question__wrapper">
       <label class="form-question__label">{{ node.text }}</label>
       <div v-if="node.type === 'input'" type="text" name="" value="">
@@ -11,10 +11,8 @@
       <div v-else-if="node.type === 'checkbox'" class="" :key="option" v-for="option in node.options">
         <input type="checkbox" v-model="answer" :name="option" :value="option"><span> {{ option }}</span>
       </div>
-      <div class="form" v-if="node.subQuestions && node.subQuestions.length">
-        <node v-for="question in node.subQuestions" v-if="question.parentOption === answer" :key="question.id" :parent-node="question.parentId" :node="question"/>
-      </div>
     </div>
+    <node v-for="question in node.subQuestions" v-if="node.subQuestions && node.subQuestions.length && question.parentOption === answer" :key="question.id" :parent-node="question.parentId" :node="question"/>
   </div>
 </template>
 
@@ -33,13 +31,35 @@ export default {
   },
   data: function () {
     return {
-      answer: this.node.type === 'checkbox' ? [] : ''
+      answer: this.node.type === 'checkbox' ? [] : '',
+      isActive: false
+    }
+  },
+  methods: {
+    validateAnswer: function (answer) {
+      return new Promise((resolve, reject) => {
+        if (this.node.text.includes('Height')) { resolve(this.validHeight(answer)) } else {
+          if (answer) {
+            resolve(true)
+          }
+        }
+      })
+    },
+    validHeight: function (height) {
+      return height === 'test'
     }
   },
   beforeMount: function () {
+    this.$root.$on('activeAssessment', data => {
+      this.isActive = this.node.id === data.id ? data.active : false
+    })
   },
-  updated: function () {
-    // this.$root.$emit('updateAssessment', { id: this.node.id, answer: this.answer })
+  beforeUpdate: function () {
+    if (this.answer) {
+      this.validateAnswer(this.answer).then((isValid) => {
+        this.$root.$emit('updateAssessment', { id: this.node.id, answer: this.answer, isValid })
+      })
+    }
   }
 
 }

@@ -2,7 +2,7 @@
   <div class="form">
     <button @click="cycleQuestion('down')" class="cycle-question cycle-question--left" type="button" name="button">LEFT CYCLE</button>
     <assessment-node v-for="node in payload" :key="node.id" :node="node"/>
-    <button @click="cycleQuestion('up')" class="cycle-question cycle-question--right" type="button" name="button">RIGHT CYCLE</button>
+    <button @click="cycleQuestion('up')" class="cycle-question cycle-question--right" :class="{ valid : canSubmit }" type="button" name="button">RIGHT CYCLE</button>
   </div>
 </template>
 
@@ -18,26 +18,6 @@ export default {
       payload: [
         {
           id: 0,
-          text: 'Height (in centimetres):',
-          type: 'input',
-          active: true
-        },
-        {
-          id: 1,
-          text: 'Weight (in kilograms):',
-          type: 'input'
-        },
-        {
-          id: 2,
-          text: 'Have you had your blood pressure checked in the last 6 months?',
-          type: 'choose',
-          options: [
-            'Yes',
-            'No'
-          ]
-        },
-        {
-          id: 3,
           text: 'Is your blood pressure:',
           type: 'choose',
           options: [
@@ -46,7 +26,7 @@ export default {
             'High - Above 140/90'
           ],
           subQuestions: [{
-            parentId: 2,
+            parentId: 3,
             parentOption: 'High - Above 140/90',
             id: 9,
             text: 'Is your blood pressure currently being controlled with medication?',
@@ -56,6 +36,26 @@ export default {
               'No'
             ]
           }]
+        },
+        {
+          id: 1,
+          text: 'Height (in centimetres):',
+          type: 'input',
+          active: true
+        },
+        {
+          id: 2,
+          text: 'Weight (in kilograms):',
+          type: 'input'
+        },
+        {
+          id: 3,
+          text: 'Have you had your blood pressure checked in the last 6 months?',
+          type: 'choose',
+          options: [
+            'Yes',
+            'No'
+          ]
         },
         {
           id: 4,
@@ -74,22 +74,36 @@ export default {
           ]
         }
       ],
-      response: []
+      response: [],
+      canSubmit: false
     }
   },
   methods: {
     cycleQuestion: function (traverse) {
       // Extend to render new active payloads
       let self = this
-      let currentIndex = self.$_.findIndex(this.payload, (checkIndex) => checkIndex.active)
+      let currentIndex = self.getActive()
       if (traverse === 'up' && currentIndex < (this.payload.length - 1)) {
+        if (this.payload[currentIndex].subQuestions) {
+          let findSubquestion = self.$_.filter(this.payload[currentIndex].subQuestions, (subQuestion) => {
+            return subQuestion.parentOption === this.payload[currentIndex].answer
+          })
+          if (findSubquestion.length) {
+            console.log('INITIATE SUBQUESTION PROTOCOL FOR: ', findSubquestion)
+          }
+        }
+        if (!this.payload[currentIndex].answer && !this.payload[currentIndex].isValid) { return }
         delete this.payload[currentIndex].active
+        this.$root.$emit('activeAssessment', { id: currentIndex + 1, active: true })
         this.payload[currentIndex + 1].active = true
       } else if (traverse === 'down' && currentIndex > 0) {
         delete this.payload[currentIndex].active
+        this.$root.$emit('activeAssessment', { id: currentIndex - 1, active: true })
         this.payload[currentIndex - 1].active = true
       }
-      console.log(this.payload)
+    },
+    getActive: function () {
+      return this.$_.findIndex(this.payload, (checkIndex) => checkIndex.active)
     },
     extendDeep: function (arr, data) {
       let jsonFind = JSON.stringify(this.findDeep(arr, data.id))
@@ -110,10 +124,15 @@ export default {
     }
   },
   beforeMount: function () {
+    this.payload[0].active = true
     this.$root.$on('updateAssessment', data => {
       console.log('%c Node Recieved: ', 'color: #75cbbc;', data)
-      this.response = this.extendDeep(this.payload, { id: data.id, answer: data.answer })
+      this.response = this.extendDeep(this.payload, { id: data.id, answer: data.answer, isValid: data.isValid })
+      this.canSubmit = data.isValid
     })
+  },
+  mounted: function () {
+    this.$root.$emit('activeAssessment', { id: this.getActive(), active: true })
   }
 }
 </script>
@@ -140,6 +159,9 @@ export default {
       left:40px;
     }
     &--right{
+      &:not(.valid){
+        display:none;
+      }
       right:40px;
     }
   }
