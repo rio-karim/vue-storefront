@@ -18,6 +18,13 @@ export default {
       payload: [
         {
           id: 0,
+          text: 'Height (in centimetres):',
+          type: 'input',
+          active: true
+        },
+
+        {
+          id: 1,
           text: 'Is your blood pressure:',
           type: 'choose',
           options: [
@@ -26,7 +33,7 @@ export default {
             'High - Above 140/90'
           ],
           subQuestions: [{
-            parentId: 3,
+            parentId: 1,
             parentOption: 'High - Above 140/90',
             id: 9,
             text: 'Level 2 Test',
@@ -58,12 +65,6 @@ export default {
               }]
             }]
           }]
-        },
-        {
-          id: 1,
-          text: 'Height (in centimetres):',
-          type: 'input',
-          active: true
         },
         {
           id: 2,
@@ -111,11 +112,9 @@ export default {
           // Clear sub-active status from hard-coded origin question
           let currentSub = self.$el.querySelector('.form-question.active .form-question-container.sub-active')
           let el = traverse === 'down' ? currentSub.previousElementSibling : currentSub.nextElementSibling
-          if (traverse === 'up') {
-            if (!el) {
-              console.log('Next master question')
-              return false
-            }
+          if (!el) {
+            console.log('Next master question')
+            return false
           }
           self.$_.each(self.$el.querySelectorAll('.form-question.active .form-question-container'), (el) => {
             if (el.classList.contains('sub-active')) {
