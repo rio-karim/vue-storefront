@@ -1,12 +1,26 @@
 <template>
-  <div class="form-question" :class="{ active: isActive }">
-    <div class="form-question__wrapper">
+  <div :class="{ 'active': isActive, 'form-question-container': node.parentId && node.parentOption, 'form-question': !node.parentId && !node.parentOption }">
+    <div v-if="!node.parentId && !node.parentOption" class="form-question-container sub-active">
+      <div class="form-question-container__wrapper">
+        <label class="form-question__label">{{ node.text }}</label>
+        <div v-if="node.type === 'input'" type="text" name="" value="">
+          <input v-model="answer" type="text" name="" value="">
+        </div>
+        <div v-else-if="node.type === 'choose'" class="" :key="option" v-for="option in node.options">
+          <button :class="{ 'selected': answer === option }" :question="node.text" @click="answer = option"> {{ option }}</button>
+        </div>
+        <div v-else-if="node.type === 'checkbox'" class="" :key="option" v-for="option in node.options">
+          <input type="checkbox" v-model="answer" :name="option" :value="option"><span> {{ option }}</span>
+        </div>
+      </div>
+    </div>
+    <div v-else class="form-question-container__wrapper">
       <label class="form-question__label">{{ node.text }}</label>
       <div v-if="node.type === 'input'" type="text" name="" value="">
         <input v-model="answer" type="text" name="" value="">
       </div>
       <div v-else-if="node.type === 'choose'" class="" :key="option" v-for="option in node.options">
-        <button :class="{ selected: answer === option }" :question="node.text" @click="answer = option"> {{ option }}</button>
+        <button :class="{ 'selected': answer === option }" :question="node.text" @click="answer = option"> {{ option }}</button>
       </div>
       <div v-else-if="node.type === 'checkbox'" class="" :key="option" v-for="option in node.options">
         <input type="checkbox" v-model="answer" :name="option" :value="option"><span> {{ option }}</span>
@@ -51,8 +65,14 @@ export default {
   },
   beforeMount: function () {
     this.$root.$on('activeAssessment', data => {
-      this.isActive = this.node.id === data.id ? data.active : false
+      this.isActive = this.node.id === data.id
     })
+  },
+  mounted: function () {
+    let nestedQuestion = this.$el.parentNode.querySelector('.form-question-container__wrapper').nextElementSibling
+    if (nestedQuestion) {
+      nestedQuestion.parentNode.parentNode.appendChild(nestedQuestion)
+    }
   },
   beforeUpdate: function () {
     if (this.answer) {
@@ -77,6 +97,7 @@ export default {
     justify-content: center;
     background:white;
     display:none;
+    flex-flow:column nowrap;
     button{
       padding:10px;
       &.selected{
@@ -88,8 +109,17 @@ export default {
       display:flex;
     }
 
-    &__wrapper{
-      max-width:1280px;
+    &-container{
+      flex:1;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      &__wrapper{
+        max-width:1280px;
+      }
+      &.sub-active{
+        display:flex;
+      }
     }
   }
 </style>

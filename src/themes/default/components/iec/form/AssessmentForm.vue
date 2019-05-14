@@ -29,12 +29,34 @@ export default {
             parentId: 3,
             parentOption: 'High - Above 140/90',
             id: 9,
-            text: 'Is your blood pressure currently being controlled with medication?',
+            text: 'Level 2 Test',
             type: 'choose',
             options: [
               'Yes',
               'No'
-            ]
+            ],
+            subQuestions: [{
+              parentId: 9,
+              parentOption: 'Yes',
+              id: 21,
+              text: 'Level 3 Test',
+              type: 'choose',
+              options: [
+                'Yes',
+                'No'
+              ],
+              subQuestions: [{
+                parentId: 21,
+                parentOption: 'Yes',
+                id: 37,
+                text: 'Level 4 Test',
+                type: 'choose',
+                options: [
+                  'Yes',
+                  'No'
+                ]
+              }]
+            }]
           }]
         },
         {
@@ -79,27 +101,64 @@ export default {
     }
   },
   methods: {
+    cycleSubQuestion: function (question, traverse) {
+      let self = this
+      if (question.subQuestions) {
+        let findSubquestion = self.$_.filter(question.subQuestions, (subQuestion) => {
+          return subQuestion.parentOption === question.answer
+        })
+        if (findSubquestion.length) {
+          // Clear sub-active status from hard-coded origin question
+          let currentSub = self.$el.querySelector('.form-question.active .form-question-container.sub-active')
+          let el = traverse === 'down' ? currentSub.previousElementSibling : currentSub.nextElementSibling
+          if (traverse === 'up') {
+            if (!el) {
+              console.log('Next master question')
+              return false
+            }
+          }
+          self.$_.each(self.$el.querySelectorAll('.form-question.active .form-question-container'), (el) => {
+            if (el.classList.contains('sub-active')) {
+              el.classList.remove('sub-active')
+            }
+          })
+          el.classList.add('sub-active')
+          console.log('Next sub question')
+          return true
+        }
+      }
+      console.log('Next master question')
+      return false
+    },
+    isValid: function (question) {
+      return question.isValid && question.answer
+    },
     cycleQuestion: function (traverse) {
-      // Extend to render new active payloads
       let self = this
       let currentIndex = self.getActive()
+      // Go forward in the questions
       if (traverse === 'up' && currentIndex < (this.payload.length - 1)) {
-        if (this.payload[currentIndex].subQuestions) {
-          let findSubquestion = self.$_.filter(this.payload[currentIndex].subQuestions, (subQuestion) => {
-            return subQuestion.parentOption === this.payload[currentIndex].answer
+        // If there are subquestions to go forward to, check the required answer has been given
+        let cycling = self.cycleSubQuestion(this.payload[currentIndex], traverse)
+        if (!cycling && self.isValid(this.payload[currentIndex])) {
+          delete this.payload[currentIndex].active
+          this.$root.$emit('activeAssessment', {
+            id: currentIndex + 1,
+            active: true
           })
-          if (findSubquestion.length) {
-            console.log('INITIATE SUBQUESTION PROTOCOL FOR: ', findSubquestion)
-          }
+          this.payload[currentIndex + 1].active = true
         }
-        if (!this.payload[currentIndex].answer && !this.payload[currentIndex].isValid) { return }
-        delete this.payload[currentIndex].active
-        this.$root.$emit('activeAssessment', { id: currentIndex + 1, active: true })
-        this.payload[currentIndex + 1].active = true
       } else if (traverse === 'down' && currentIndex > 0) {
-        delete this.payload[currentIndex].active
-        this.$root.$emit('activeAssessment', { id: currentIndex - 1, active: true })
-        this.payload[currentIndex - 1].active = true
+        // Code here to check there are subquestions to back into
+        let cycling = self.cycleSubQuestion(this.payload[currentIndex], traverse)
+        if (!cycling) {
+          delete this.payload[currentIndex].active
+          this.$root.$emit('activeAssessment', {
+            id: currentIndex - 1,
+            active: true
+          })
+          this.payload[currentIndex - 1].active = true
+        }
       }
     },
     getActive: function () {
