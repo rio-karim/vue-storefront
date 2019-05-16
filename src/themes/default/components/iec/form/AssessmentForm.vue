@@ -1,8 +1,58 @@
 <template>
-  <div class="form">
-    <button @click="cycleQuestion('down')" class="cycle-question cycle-question--left" type="button" name="button">LEFT CYCLE</button>
+  <div class="AssessmentForm">
+    <button @click="cycleQuestion('down')" class="AssessmentForm__button AssessmentForm__button-back" :class="{ valid : canBack }" type="button" name="button"><span>
+      <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="444.819px" height="444.819px" viewBox="0 0 444.819 444.819" style="enable-background:new 0 0 444.819 444.819;" xml:space="preserve">
+        <g>
+          <path d="M434.252,114.203l-21.409-21.416c-7.419-7.04-16.084-10.561-25.975-10.561c-10.095,0-18.657,3.521-25.7,10.561   L222.41,231.549L83.653,92.791c-7.042-7.04-15.606-10.561-25.697-10.561c-9.896,0-18.559,3.521-25.979,10.561l-21.128,21.416   C3.615,121.436,0,130.099,0,140.188c0,10.277,3.619,18.842,10.848,25.693l185.864,185.865c6.855,7.23,15.416,10.848,25.697,10.848   c10.088,0,18.75-3.617,25.977-10.848l185.865-185.865c7.043-7.044,10.567-15.608,10.567-25.693   C444.819,130.287,441.295,121.629,434.252,114.203z"/>
+        </g>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+        <g/>
+      </svg>
+    </span><span>Previous question</span>
+    </button>
+    <router-link
+      class="AssessmentForm__button AssessmentForm__button-back AssessmentForm__button-exit"
+      :class="{ valid : !canBack }"
+      to="/"
+      exact>
+      <span>
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" width="444.819px" height="444.819px" viewBox="0 0 444.819 444.819" style="enable-background:new 0 0 444.819 444.819;" xml:space="preserve">
+          <g>
+            <path d="M434.252,114.203l-21.409-21.416c-7.419-7.04-16.084-10.561-25.975-10.561c-10.095,0-18.657,3.521-25.7,10.561   L222.41,231.549L83.653,92.791c-7.042-7.04-15.606-10.561-25.697-10.561c-9.896,0-18.559,3.521-25.979,10.561l-21.128,21.416   C3.615,121.436,0,130.099,0,140.188c0,10.277,3.619,18.842,10.848,25.693l185.864,185.865c6.855,7.23,15.416,10.848,25.697,10.848   c10.088,0,18.75-3.617,25.977-10.848l185.865-185.865c7.043-7.044,10.567-15.608,10.567-25.693   C444.819,130.287,441.295,121.629,434.252,114.203z"/>
+          </g>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+          <g/>
+        </svg>
+      </span><span>Exit</span>
+    </router-link>
     <assessment-node v-for="node in payload" :key="node.id" :node="node"/>
-    <button @click="cycleQuestion('up')" class="cycle-question cycle-question--right" :class="{ valid : canSubmit }" type="button" name="button">RIGHT CYCLE</button>
+    <button @click="cycleQuestion('up')" class="AssessmentForm__button AssessmentForm__button-submit" :class="{ valid : canSubmit }" type="button" name="button"><span>Submit</span></button>
   </div>
 </template>
 
@@ -98,7 +148,8 @@ export default {
         }
       ],
       response: [],
-      canSubmit: false
+      canSubmit: false,
+      canBack: false
     }
   },
   methods: {
@@ -122,7 +173,6 @@ export default {
             }
           })
           el.classList.add('sub-active')
-          console.log('Next sub question')
           return true
         }
       }
@@ -147,6 +197,7 @@ export default {
           })
           this.payload[currentIndex + 1].active = true
         }
+        this.canSubmit = false
       } else if (traverse === 'down' && currentIndex > 0) {
         // Code here to check there are subquestions to back into
         let cycling = self.cycleSubQuestion(this.payload[currentIndex], traverse)
@@ -159,6 +210,8 @@ export default {
           this.payload[currentIndex - 1].active = true
         }
       }
+      this.canSubmit = true
+      this.canBack = !this.payload[0].active
     },
     getActive: function () {
       return this.$_.findIndex(this.payload, (checkIndex) => checkIndex.active)
@@ -183,6 +236,7 @@ export default {
   },
   beforeMount: function () {
     this.payload[0].active = true
+    this.canBack = !this.payload[0].active
     this.$root.$on('updateAssessment', data => {
       console.log('%c Node Recieved: ', 'color: #75cbbc;', data)
       this.response = this.extendDeep(this.payload, { id: data.id, answer: data.answer, isValid: data.isValid })
@@ -196,7 +250,8 @@ export default {
 </script>
 
 <style lang='scss' scoped>
-.form{
+@import 'theme/css/main.scss';
+.AssessmentForm{
   align-items: center;
   justify-content:center;
   position:absolute;
@@ -205,22 +260,66 @@ export default {
   bottom:0;
   top:0;
 
-  button.cycle-question{
+  &__button{
     position:fixed;
-    top:50%;
-    bottom:50%;
-    height:40px;
-    width:40px;
-    display:block;
+    top:75px;
+    display:flex;
     z-index:3000;
-    &--left{
-      left:40px;
+    align-items: center;
+    justify-content: center;
+    border-radius:50px;
+    background:$color-primary;
+    border:none;
+    cursor:pointer;
+    color:white;
+    font-size:14px;
+    padding:0 7px;
+    &::after{
+      display:none;
     }
-    &--right{
-      &:not(.valid){
-        display:none;
+    &-back{
+      left:40px;
+      min-width:70px;
+      &:hover{
+        span:last-child{
+          opacity:1;
+        }
       }
+      span:first-child{
+        background:white;
+        border-radius:50%;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        padding:10px;
+        box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+        svg{
+          height:15px;
+          width:auto;
+          fill: #CC7685;
+          transform: rotate(90deg);
+        }
+      }
+      span:last-child{
+        transition:opacity .2s ease-in-out;
+        margin:0 10px;
+        opacity:.4;
+        flex:1;
+      }
+    }
+    &-exit{
+      span:last-child{
+        opacity:1;
+      }
+    }
+    &-submit{
       right:40px;
+      span:first-child{
+        padding:10px;
+      }
+    }
+    &:not(.valid){
+      display:none;
     }
   }
 }

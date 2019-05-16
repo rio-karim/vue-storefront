@@ -26,7 +26,7 @@
         @close="$store.commit('ui/setWishlist')"
       />
       <slot/>
-      <main-footer/>
+      <!-- <main-footer/> -->
       <notification/>
       <sign-up/>
       <cookie-notification/>

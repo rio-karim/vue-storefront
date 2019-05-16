@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="container">
+  <div id="content" class="Assessment">
     <AssessmentForm/>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default {
 
 <style lang="scss" scoped>
 @import 'theme/css/main.scss';
-.container{
+.Assessment{
   position:fixed;
   top:54px;
   bottom:0;
@@ -42,10 +42,5 @@ export default {
   z-index:2000;
   width:unset;
   max-width:unset;
-}
-</style>
-<style lang="scss">
-footer{
-  display:none;
 }
 </style>
