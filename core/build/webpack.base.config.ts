@@ -125,7 +125,10 @@ export default {
         enforce: 'pre',
         test: /\.(js|vue)$/,
         loader: 'eslint-loader',
-        exclude: [/node_modules/, /test/]
+        exclude: [/node_modules/, /test/],
+        options : {
+          fix: true
+        }
       },
       {
         test: /\.vue$/,
