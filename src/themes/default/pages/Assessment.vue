@@ -22,7 +22,7 @@ export default {
     left: 0;
     right: 0;
     display: flex;
-    z-index: 2000;
+    z-index: 2;
     width: unset;
     max-width: unset;
 }

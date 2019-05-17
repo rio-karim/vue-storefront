@@ -341,7 +341,7 @@ export default {
             align-items: center;
             .action__button {
                 display: flex;
-                z-index: 3000;
+                z-index: 2;
                 align-items: center;
                 justify-content: center;
                 border-radius: 50px;
