@@ -79,6 +79,7 @@ export default {
       this.validateAnswer(this.answer).then((valid) => {
         this.$root.$emit('updateAssessmentForm', {
           id: this.node.id,
+          nodeId: this.node.nodeId,
           answer: this.answer,
           isValid: valid
         })
@@ -129,10 +130,18 @@ export default {
     }
     &-container {
         flex: 1;
-        width: 100%;
-        display: none;
+        position:absolute;
+        top:0;
+        bottom:0;
+        left:-210%;
+        width:100%;
+        display: flex;
         align-items: center;
         justify-content: center;
+        transition:left .4s ease-in-out;
+        &.sub-active {
+          left:0;
+        }
         &__wrapper {
             width: 100%;
             max-width: 400px;
@@ -232,9 +241,6 @@ export default {
                     }
                 }
             }
-        }
-        &.sub-active {
-            display: flex;
         }
     }
 }

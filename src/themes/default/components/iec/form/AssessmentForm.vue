@@ -134,7 +134,8 @@ export default {
             'High - Above 140/90'
           ],
           subQuestions: [{
-            parentId: 3,
+            parentId: 4,
+            nodeId: 4,
             parentOption: 'High - Above 140/90',
             id: 9,
             text: 'Level 2 Test',
@@ -145,6 +146,7 @@ export default {
             ],
             subQuestions: [{
               parentId: 9,
+              nodeId: 4,
               parentOption: 'Yes',
               id: 21,
               text: 'Level 3 Test',
@@ -155,6 +157,7 @@ export default {
               ],
               subQuestions: [{
                 parentId: 21,
+                nodeId: 4,
                 parentOption: 'Yes',
                 id: 37,
                 text: 'Level 4 Test',
@@ -227,6 +230,7 @@ export default {
           let currentSub = self.$el.querySelector('.form-question.active .form-question-container.sub-active')
           let el = traverse === 'down' ? currentSub.previousElementSibling : currentSub.nextElementSibling
           if (!el) {
+            this.$delete(this.nodeList[this.getActive()], 'subActive')
             return false
           }
           self.$_.each(self.$el.querySelectorAll('.form-question.active .form-question-container'), (el) => {
@@ -235,9 +239,11 @@ export default {
             }
           })
           el.classList.add('sub-active')
+          this.$set(this.nodeList[this.getActive()], 'subActive', true)
           return true
         }
       }
+      this.$delete(this.nodeList[this.getActive()], 'subActive')
       return false
     },
     cycleQuestion: function(traverse) {
@@ -301,7 +307,7 @@ export default {
         answer: data.answer,
         isValid: data.isValid && !!data.answer
       })
-      this.$set(this.nodeList, data.id, response[data.id])
+      this.$set(this.nodeList, data.nodeId, response[data.nodeId])
       if (data.isValid) {
         this.cycleQuestion('up')
       }
