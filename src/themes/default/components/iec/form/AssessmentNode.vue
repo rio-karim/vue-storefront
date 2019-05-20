@@ -79,7 +79,7 @@ export default {
       this.validateAnswer(this.answer).then((valid) => {
         this.$root.$emit('updateAssessmentForm', {
           id: this.node.id,
-          nodeId: this.node.nodeId,
+          nodeId: this.node.nodeId || false,
           answer: this.answer,
           isValid: valid
         })

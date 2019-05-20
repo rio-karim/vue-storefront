@@ -8,11 +8,22 @@
 
 <script>
 import ConditionSelector from '../components/iec/ConditionSelector.vue'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   components: {
     'condition-selector': ConditionSelector
   },
-  created() {}
+  computed: {
+    ...mapGetters('assessment', ['getAssessment']),
+    sessionAssessment: function () {
+      if(!this.getAssessment.length) {
+        this.fetchAssessment()
+      }
+      console.log(this.getAssessment)
+      return this.getAssessment
+    }
+  },
+  methods: mapActions('assessment', ['fetchAssessment']),
 }
 </script>
 

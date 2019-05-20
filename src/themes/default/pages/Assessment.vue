@@ -1,14 +1,21 @@
 <template lang="html">
   <div id="content" class="Assessment">
-    <AssessmentForm/>
+    <AssessmentForm :nodeList="sessionAssessment"/>
   </div>
 </template>
 
 <script>
 import AssessmentForm from 'theme/components/iec/form/AssessmentForm.vue'
+import { mapGetters } from 'vuex'
 export default {
   components: {
     AssessmentForm
+  },
+  computed: {
+    ...mapGetters('assessment', ['getAssessment']),
+    sessionAssessment: function () {
+      return this.getAssessment
+    }
   },
 }
 </script>

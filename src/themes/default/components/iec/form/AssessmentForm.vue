@@ -80,145 +80,25 @@
 <script>
 import AssessmentNode from './AssessmentNode'
 import AssessmentProgress from './AssessmentProgress'
-
+import { mapActions } from 'vuex'
 export default {
   components: {
     AssessmentNode,
     AssessmentProgress
   },
+  props: {
+    nodeList: {
+      type: Array,
+      default: () => []
+    }
+  },
   data: function() {
     return {
-      nodeList: [{
-          id: 0,
-          text: 'Are you male?',
-          type: 'choose',
-          options: [
-            'Yes',
-            'No'
-          ]
-        },
-        {
-          id: 1,
-          text: 'How tall are you?',
-          type: 'input',
-          options: [
-            'Yes',
-            'No'
-          ]
-        },
-        {
-          id: 2,
-          text: 'Are you over 18, but under 65?',
-          type: 'choose',
-          options: [
-            'Yes',
-            'No'
-          ]
-        },
-        {
-          id: 3,
-          text: 'Are you having difficulty getting or keeping a solid erection?',
-          type: 'choose',
-          options: [
-            'Yes',
-            'No'
-          ]
-        },
-        {
-          id: 4,
-          text: 'What level is your blood pressure?',
-          type: 'choose',
-          options: [
-            'Low: Below 90/60',
-            'Normal: Between 90/60 - 140/90',
-            'High - Above 140/90'
-          ],
-          subQuestions: [{
-            parentId: 4,
-            nodeId: 4,
-            parentOption: 'High - Above 140/90',
-            id: 9,
-            text: 'Level 2 Test',
-            type: 'choose',
-            options: [
-              'Yes',
-              'No'
-            ],
-            subQuestions: [{
-              parentId: 9,
-              nodeId: 4,
-              parentOption: 'Yes',
-              id: 21,
-              text: 'Level 3 Test',
-              type: 'choose',
-              options: [
-                'Yes',
-                'No'
-              ],
-              subQuestions: [{
-                parentId: 21,
-                nodeId: 4,
-                parentOption: 'Yes',
-                id: 37,
-                text: 'Level 4 Test',
-                type: 'choose',
-                options: [
-                  'Yes',
-                  'No'
-                ]
-              }]
-            }]
-          }]
-        },
-        {
-          id: 5,
-          text: 'Are you taking any of the following medication?',
-          textList: [
-            'Recreational drug use prohibited by law (Class A,B or C)',
-            'Warfarin - used to to prevent heart attacks, strokes, and blood clots',
-
-          ],
-          type: 'choose',
-          options: [
-            'Yes',
-            'No',
-          ]
-        },
-        {
-          id: 6,
-          text: 'Do you have an allergy to any of the following?',
-          textList: [
-            'Viagra (sildenafil)',
-            'Levitra (vardenafil)',
-            'Spedra (avanafil)'
-
-          ],
-          type: 'choose',
-          options: [
-            'Yes',
-            'No',
-          ]
-        },
-        {
-          id: 7,
-          text: 'Do you suffer from any of the following?',
-          textList: [
-            'Heart disease including heart attack',
-            'Stroke or mini stroke',
-            'Vision problems due to poor circulation'
-
-          ],
-          type: 'choose',
-          options: [
-            'Yes',
-            'No',
-          ]
-        }
-      ],
       canBack: false,
     }
   },
   methods: {
+    ...mapActions(['commitAssessment']),
     cycleSubQuestion: function(question, traverse) {
       let self = this
       if (question.subQuestions) {
@@ -233,13 +113,13 @@ export default {
             this.$delete(this.nodeList[this.getActive()], 'subActive')
             return false
           }
+          this.$set(this.nodeList[this.getActive()], 'subActive', true)
           self.$_.each(self.$el.querySelectorAll('.form-question.active .form-question-container'), (el) => {
             if (el.classList.contains('sub-active')) {
               el.classList.remove('sub-active')
             }
           })
           el.classList.add('sub-active')
-          this.$set(this.nodeList[this.getActive()], 'subActive', true)
           return true
         }
       }
@@ -296,7 +176,7 @@ export default {
       }
     },
     submit: function() {
-      console.log('%c Sending Response: ', 'color: #75cbbc;', this.response)
+      console.log('%c Sending Response: ', 'color: #75cbbc;', this.nodeList)
     }
   },
   beforeMount: function() {
@@ -309,6 +189,7 @@ export default {
       })
       this.$set(this.nodeList, data.nodeId, response[data.nodeId])
       if (data.isValid) {
+        this.commitAssessment(this.nodeList)
         this.cycleQuestion('up')
       }
     })

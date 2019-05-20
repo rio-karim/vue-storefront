@@ -4,7 +4,7 @@
       <li v-for="node in nodeList" :key="node.id" :class="{ complete: node.answer && !node.active, active: node.active }" class="AssessmentProgress__list-item">
         <span v-if="node.answer && !node.active">✔</span>
         <span v-else>{{ (node.id+1) }}</span>
-        <div class="subActive" v-if="node.active && node.subActive">!</div>
+        <div class="subActive" :class="{ show : node.active && node.subActive }"> <span>!</span> </div>
       </li>
     </ul>
   </div>
@@ -48,6 +48,8 @@ export default {
       align-items: center;
       justify-content: center;
       margin:0 15px;
+      position:relative;
+      z-index:2;
       &.active{
         color:white;
         background:#CC7685;
@@ -58,15 +60,23 @@ export default {
       }
       .subActive{
         position:absolute;
-        bottom:100%;
-        background: red;
+        background: rgb(204,118,133);
+        background: linear-gradient(0deg, rgba(204,118,133,1) 0%, rgba(235,88,0,1) 100%);
         color:white;
         border-radius:50%;
         width:25px;
         height:25px;
-        display:flex;
         align-items: center;
+        bottom:0;
+        display:flex;
         justify-content: center;
+        transition:all .4s ease-in-out;
+        opacity:0;
+        z-index:1;
+        &.show{
+          opacity:1;
+          bottom:125%;
+        }
       }
     }
   }
