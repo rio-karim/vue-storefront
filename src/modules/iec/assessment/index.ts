@@ -29,6 +29,7 @@ const store = {
   getters: {
     getAssessment: state => state.nodeList,
     getCompletedCount: (state) => {
+      console.log(window.sessionStorage)
       let i = 0
       state.nodeList.forEach((nodeItem) => {
         if(nodeItem.answer) {

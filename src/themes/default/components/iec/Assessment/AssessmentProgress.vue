@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="AssessmentProgress">
     <ul class="AssessmentProgress__list">
-      <li v-for="node in nodeList" :key="node.id" :class="{ complete: node.answer && !node.active, active: node.active }" class="AssessmentProgress__list-item">
+      <li v-for="node in nodeList" :key="node.id" :class="{ complete: node.answer && node.id !== getActive, active: node.id === getActive }" class="AssessmentProgress__list-item">
         <span v-if="node.answer && !node.active">✔</span>
         <span v-else>{{ (node.id+1) }}</span>
         <div class="subActive" :class="{ show : node.active && node.subActive }"> <span>!</span> </div>
@@ -11,16 +11,15 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   name:'Progress',
+  computed: mapGetters('assessment', ['getActive']),
   props: {
     nodeList: {
       type:Array,
       default: null
     }
-  },
-  updated: function () {
-    console.log(this.nodeList)
   }
 }
 </script>
