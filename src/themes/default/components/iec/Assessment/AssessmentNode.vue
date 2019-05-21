@@ -122,14 +122,11 @@ export default {
     flex-flow: column nowrap;
     display: flex;
     transition:right .4s ease-in-out;
-    opacity:0;
     &.active {
       right:0;
-      opacity:1;
     }
     &.complete {
       right:110%;
-      opacity:0;
     }
     &-container {
         flex: 1;

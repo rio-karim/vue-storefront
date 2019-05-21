@@ -2,28 +2,43 @@
 <div id="content" class="Home">
   <div class="container">
     <condition-selector />
+    <assessment-resume v-if="assessment.length" :nodeList="assessment"/>
   </div>
 </div>
 </template>
 
 <script>
-import ConditionSelector from '../components/iec/ConditionSelector.vue'
+import AssessmentSelector from '../components/iec/AssessmentSelector.vue'
+import AssessmentResume from 'theme/components/iec/Assessment/AssessmentResume.vue'
 import { mapGetters, mapActions } from 'vuex'
+
 export default {
   components: {
-    'condition-selector': ConditionSelector
+    'condition-selector': AssessmentSelector,
+    'assessment-resume': AssessmentResume
   },
-  computed: {
-    ...mapGetters('assessment', ['getAssessment']),
+  computed: mapGetters('assessment', ['getAssessment']),
+  methods: {
+    ...mapActions('assessment', ['fetchAssessment']),
     sessionAssessment: function () {
-      if(!this.getAssessment.length) {
-        this.fetchAssessment()
+      if(!this.getAssessment.length){
+        return this.fetchAssessment().then((res) => {
+          this.assessment = res
+        })
       }
-      console.log(this.getAssessment)
-      return this.getAssessment
+      else{
+        this.assessment = this.getAssessment
+      }
     }
   },
-  methods: mapActions('assessment', ['fetchAssessment']),
+  beforeMount: function () {
+    this.sessionAssessment()
+  },
+  data: function() {
+    return {
+      assessment: {}
+    }
+  }
 }
 </script>
 

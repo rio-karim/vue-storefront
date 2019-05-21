@@ -80,7 +80,6 @@
 <script>
 import AssessmentNode from './AssessmentNode'
 import AssessmentProgress from './AssessmentProgress'
-import { mapActions } from 'vuex'
 export default {
   components: {
     AssessmentNode,
@@ -98,7 +97,6 @@ export default {
     }
   },
   methods: {
-    ...mapActions('assessment', ['commitAssessment']),
     cycleSubQuestion: function(question, traverse) {
       let self = this
       if (question.subQuestions) {
@@ -174,14 +172,10 @@ export default {
           }
         }
       }
-    },
-    submit: function() {
-      console.log('%c Sending Response: ', 'color: #75cbbc;', this.nodeList)
     }
   },
   beforeMount: function() {
     this.$root.$on('updateAssessmentForm', data => {
-      console.log('%c Node Recieved: ', 'color: #75cbbc;', data)
       let response = this.extendDeep(this.nodeList, {
         id: data.id,
         answer: data.answer,
@@ -190,44 +184,18 @@ export default {
       this.$set(this.nodeList, data.nodeId, response[data.nodeId])
       if (data.isValid) {
         this.$store.dispatch('assessment/commitAssessment', this.nodeList)
+        
         this.cycleQuestion('up')
       }
     })
   },
-  mounted: function () {
-    if(!this.nodeList.length) { return }
-    if(this.getActive() <= 0) {
-      this.$set(this.nodeList[0], 'active', true)
-      this.$root.$emit('updateAssessmentNodes', {
-        id: 0,
-        active: true,
-      })
-    }
-    else {
-      this.$root.$emit('updateAssessmentNodes', {
-        id: this.getActive(),
-        active: true,
-      })
-    }
+  mounted: function() {
+    this.$set(this.nodeList[0], 'active', true)
     this.canBack = !this.nodeList[0].active
-  },
-  updated: function () {
-    console.log('ACTIVE ', this.getActive())
-    if(!this.nodeList.length) { return }
-    if(this.getActive() <= 0) {
-      this.$set(this.nodeList[0], 'active', true)
-      this.$root.$emit('updateAssessmentNodes', {
-        id: 0,
-        active: true,
-      })
-    }
-    else {
-      this.$root.$emit('updateAssessmentNodes', {
-        id: this.getActive(),
-        active: true,
-      })
-    }
-    this.canBack = !this.nodeList[0].active
+    this.$root.$emit('updateAssessmentNodes', {
+      id: 0,
+      active: true,
+    })
   },
   beforeDestroy: function () {
     this.$root.$off('updateAssessmentForm')

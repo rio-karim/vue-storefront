@@ -16,6 +16,7 @@ const store = {
     async fetchAssessment({ commit }) {
       const response = await axios.get('http://localhost:3030/assets/iec/assessment.json')
       commit('setAssessment', response.data)
+      return response.data
     },
     // async commitAssessment( { commit }, assessment) {
     //   const response = await axios.post('http://localhost:3030/assets/iec/assessment.json', assessment)
