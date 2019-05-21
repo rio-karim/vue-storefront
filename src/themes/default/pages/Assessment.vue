@@ -1,6 +1,6 @@
 <template lang="html">
   <div :class="{ ready: assessment }" id="content" class="Assessment">
-    <assessment-form v-if="assessment.length" :nodeList="assessment"/>
+    <assessment-form v-if="assessment.length" :nodeActive="getActive" :nodeList="getAssessment"/>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ export default {
   components: {
     'assessment-form': AssessmentForm
   },
-  computed: mapGetters('assessment', ['getAssessment']),
+  computed: mapGetters('assessment', ['getAssessment', 'getActive']),
   methods: {
     ...mapActions('assessment', ['fetchAssessment']),
     sessionAssessment: function () {

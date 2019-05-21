@@ -39,6 +39,15 @@ const store = {
         answered: i,
         length: state.nodeList.length
       }
+    },
+    getActive: (state) => {
+      let i = 0
+      state.nodeList.forEach((nodeItem, x) => {
+        if(nodeItem.active) {
+          i = x
+        }
+      })
+      return i
     }
   },
   setters: {

@@ -89,6 +89,10 @@ export default {
     nodeList: {
       type: Array,
       default: () => []
+    },
+    nodeActive: {
+      type: Number,
+      default: 0
     }
   },
   data: function() {
@@ -108,10 +112,10 @@ export default {
           let currentSub = self.$el.querySelector('.form-question.active .form-question-container.sub-active')
           let el = traverse === 'down' ? currentSub.previousElementSibling : currentSub.nextElementSibling
           if (!el) {
-            this.$delete(this.nodeList[this.getActive()], 'subActive')
+            this.$delete(this.nodeList[this.nodeActive], 'subActive')
             return false
           }
-          this.$set(this.nodeList[this.getActive()], 'subActive', true)
+          this.$set(this.nodeList[this.nodeActive], 'subActive', true)
           self.$_.each(self.$el.querySelectorAll('.form-question.active .form-question-container'), (el) => {
             if (el.classList.contains('sub-active')) {
               el.classList.remove('sub-active')
@@ -121,12 +125,12 @@ export default {
           return true
         }
       }
-      this.$delete(this.nodeList[this.getActive()], 'subActive')
+      this.$delete(this.nodeList[this.nodeActive], 'subActive')
       return false
     },
     cycleQuestion: function(traverse) {
       let self = this
-      let currentIndex = self.getActive()
+      let currentIndex = this.nodeActive
       // Go forward in the questions
       if (traverse === 'up' && currentIndex < (this.nodeList.length - 1)) {
         // If there are subquestions to go forward to, check the required answer has been given
@@ -134,6 +138,10 @@ export default {
         if (!cycling && self.isValid(this.nodeList[currentIndex])) {
           this.$delete(this.nodeList[currentIndex], 'active')
           this.$set(this.nodeList[currentIndex + 1], 'active', true)
+          this.$root.$emit('updateAssessmentNodes', {
+            id: currentIndex + 1,
+            active: true
+          })
         }
       } else if (traverse === 'down' && currentIndex > 0) {
         // Code here to check there are subquestions to back into
@@ -142,15 +150,16 @@ export default {
           this.$delete(this.nodeList[currentIndex], 'active')
           this.$set(this.nodeList[currentIndex - 1], 'active', true)
         }
+        this.$root.$emit('updateAssessmentNodes', {
+          id: currentIndex - 1,
+          active: true
+        })
       }
       this.canBack = !this.nodeList[0].active
-      this.$root.$emit('updateAssessmentNodes', {
-        id: this.getActive(),
-        active: true
-      })
+      this.$store.dispatch('assessment/commitAssessment', this.nodeList)
     },
     getActive: function() {
-      return this.$_.findIndex(this.nodeList, (checkIndex) => checkIndex.active)
+      return this.nodeActive
     },
     isValid: function(question) {
       return question.isValid && question.answer
@@ -183,18 +192,15 @@ export default {
       })
       this.$set(this.nodeList, data.nodeId, response[data.nodeId])
       if (data.isValid) {
-        this.$store.dispatch('assessment/commitAssessment', this.nodeList)
-        
         this.cycleQuestion('up')
       }
     })
   },
-  mounted: function() {
-    this.$set(this.nodeList[0], 'active', true)
+  mounted: function () {
     this.canBack = !this.nodeList[0].active
     this.$root.$emit('updateAssessmentNodes', {
-      id: 0,
-      active: true,
+      id: this.nodeActive,
+      active: true
     })
   },
   beforeDestroy: function () {
