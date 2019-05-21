@@ -27,7 +27,19 @@ const store = {
     }
   },
   getters: {
-    getAssessment: state => state.nodeList
+    getAssessment: state => state.nodeList,
+    getCompletedCount: (state) => {
+      let i = 0
+      state.nodeList.forEach((nodeItem) => {
+        if(nodeItem.answer) {
+          i++
+        }
+      })
+      return {
+        answered: i,
+        length: state.nodeList.length
+      }
+    }
   },
   setters: {
 

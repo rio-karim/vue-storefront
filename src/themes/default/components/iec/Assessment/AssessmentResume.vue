@@ -6,8 +6,8 @@
     exact>
 
     <div class="AssessmentResume__progress">
-      <span class="AssessmentResume__progress-bar"></span>
-      <span class="AssessmentResume__progress-text">{{ completedQuestions }}</span>
+      <span :style="`width:${(completed.answered/completed.length)*100}%;`" class="AssessmentResume__progress-bar"></span>
+      <span class="AssessmentResume__progress-text">Continue Assessment</span>
     </div>
     <div class="AssessmentResume__icon">
       <span>ED</span>
@@ -19,22 +19,11 @@
 <script>
 export default {
   props: {
-    nodeList: {
-      type: Array,
-      default: () => []
+    completed: {
+      type: Object,
+      default: () => {}
     },
   },
-  computed: {
-    completedQuestions: function () {
-      let i = 0
-      this.$_.each(this.nodeList, (nodeItem) => {
-        if(nodeItem.answer) {
-          i++
-        }
-      })
-      return i
-    }
-  }
 }
 </script>
 <style lang="scss" scoped>
@@ -45,8 +34,9 @@ export default {
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   height: 40px;
-  position:relative;
-  margin-left: 5px;
+  position:absolute;
+  top:85px;
+  right:25px;
   width:200px;
   box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
   &__progress{
@@ -67,7 +57,6 @@ export default {
       top:0;
       bottom:0;
       left:0;
-      width:40%;
       z-index:1;
       background:#CC7685;
     }

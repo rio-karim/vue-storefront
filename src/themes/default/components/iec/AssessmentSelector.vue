@@ -90,7 +90,7 @@ export default {
         cursor: pointer;
         flex: 1;
         transition: all 0.2s ease-in-out;
-        height: 60px;
+        height: 54px;
         margin-left: 5px;
         &::after {
             display: none;
@@ -106,7 +106,7 @@ export default {
         flex-flow: row nowrap;
         justify-content: space-evenly;
         flex: 1;
-        height: 60px;
+        height: 54px;
         cursor: pointer;
         margin-right: 5px;
         .select-icon {
