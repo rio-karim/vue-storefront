@@ -33,8 +33,11 @@ const store = {
   getters: {
     getAssessment: state => state.nodeList,
     getAssessmentStats: (state) => {
-      if(!state.nodeList.length) {
+      if(!state.nodeList.length && JSON.parse(sessionStorage.getItem('assessment'))) {
         state.nodeList = JSON.parse(sessionStorage.getItem('assessment'))
+      }
+      else {
+        return false
       }
       let i = 0
       state.nodeList.forEach((nodeItem) => {
