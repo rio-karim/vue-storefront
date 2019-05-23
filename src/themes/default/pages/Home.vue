@@ -2,7 +2,7 @@
 <div id="content" class="Home">
   <div class="container">
     <condition-selector />
-    <assessment-resume v-if="getCompletedCount.answered > 0" :completed="getCompletedCount"/>
+    <assessment-resume v-if="assessmentStats && assessmentStats.answered > 0" :completed="assessmentStats"/>
   </div>
 </div>
 </template>
@@ -17,7 +17,15 @@ export default {
     'condition-selector': AssessmentSelector,
     'assessment-resume': AssessmentResume
   },
-  computed: mapGetters('assessment', ['getCompletedCount'])
+  methods: mapGetters('assessment', ['getAssessmentStats']),
+  mounted: function () {
+    this.assessmentStats = this.getAssessmentStats()
+  },
+  data: function () {
+    return {
+        assessmentStats: null
+    }
+  }
 }
 </script>
 

@@ -2,7 +2,6 @@ import { createModule } from '@vue-storefront/core/lib/module'
 import axios from 'axios'
 
 // TODO: Move the logic to appropriate modules and deprecate this one
-
 const KEY = 'assessment'
 const store = {
   namespaced: true,
@@ -14,22 +13,29 @@ const store = {
   },
   actions: {
     async fetchAssessment({ commit }) {
-      const response = await axios.get('http://localhost:3030/assets/iec/assessment.json')
-      commit('setAssessment', response.data)
-      return response.data
+        const cache = await JSON.parse(sessionStorage.getItem('assessment'))
+        const response = await axios.get('http://localhost:3030/assets/iec/assessment.json')
+
+        if(!cache){
+          commit('setAssessment', response.data)
+          return response.data
+        }
+        else {
+          commit('setAssessment', cache)
+          return cache
+        }
     },
-    // async commitAssessment( { commit }, assessment) {
-    //   const response = await axios.post('http://localhost:3030/assets/iec/assessment.json', assessment)
-    //   commit('setAssessment', assessment)
-    // }
     commitAssessment( { commit }, assessment) {
+      sessionStorage.setItem('assessment', JSON.stringify(assessment))
       commit('setAssessment', assessment)
     }
   },
   getters: {
     getAssessment: state => state.nodeList,
-    getCompletedCount: (state) => {
-      console.log(window.sessionStorage)
+    getAssessmentStats: (state) => {
+      if(!state.nodeList.length) {
+        state.nodeList = JSON.parse(sessionStorage.getItem('assessment'))
+      }
       let i = 0
       state.nodeList.forEach((nodeItem) => {
         if(nodeItem.answer) {
